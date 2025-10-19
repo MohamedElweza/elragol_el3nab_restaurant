@@ -74,10 +74,10 @@ flutter_icons:
 
 flutter_native_splash:
   color: "#ffffff"          # Background color
-  image: assets/images/playstore.png    # Your logo path
+  image: assets/images/native.png    # Your logo path
   android_12:
     color: "#ffffff"
-    image: assets/images/playstore.png
+    image: assets/images/native.png
 
 
 # For information on the generic Dart part of this file, see the

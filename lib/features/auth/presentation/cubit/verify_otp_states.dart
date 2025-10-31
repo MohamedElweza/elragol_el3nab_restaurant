@@ -1,5 +1,3 @@
-import '../../data/models/user_model.dart';
-
 abstract class VerifyOtpState {}
 
 class VerifyOtpInitial extends VerifyOtpState {}

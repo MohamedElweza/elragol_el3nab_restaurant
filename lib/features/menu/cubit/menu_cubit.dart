@@ -16,10 +16,6 @@ class MenuCubit extends Cubit<MenuState> {
   DateTime? _lastCategoriesUpdate;
   Map<String, DateTime> _lastItemsUpdate = {};
   
-  // Vendor profile caching
-  dynamic _cachedVendorProfile;
-  DateTime? _lastVendorUpdate;
-  
   // Cache duration (15 minutes for categories, they don't change frequently)
   static const Duration _cacheDuration = Duration(minutes: 15);
 
@@ -49,8 +45,6 @@ class MenuCubit extends Cubit<MenuState> {
     _cachedItems.clear();
     _lastCategoriesUpdate = null;
     _lastItemsUpdate.clear();
-    _cachedVendorProfile = null;
-    _lastVendorUpdate = null;
   }
 
   /// Handle common errors and return Arabic error messages
@@ -75,7 +69,7 @@ class MenuCubit extends Cubit<MenuState> {
   Future<void> loadVendorProfile({bool forceRefresh = false}) async {
     try {
       _safeEmit(MenuLoadingVendor());
-      log('🍽️ MenuCubit: Loading vendor profile...');
+      log('🍽️ MenuCubit: Loading vendor profile from API...');
       
       // First check if vendor exists
       final vendorExists = await _menuRepository.checkVendorExists();
@@ -249,74 +243,15 @@ class MenuCubit extends Cubit<MenuState> {
     return false;
   }
 
-  /// Refresh vendor profile in background without affecting UI state
-  void _refreshVendorProfileInBackground() {
-    log('🍽️ MenuCubit: Refreshing vendor profile in background...');
-    
-    _menuRepository.getVendorProfile().then((vendor) {
-      // Update cache silently
-      _cachedVendorProfile = vendor;
-      _lastVendorUpdate = DateTime.now();
-      
-      // Only emit new state if vendor data actually changed
-      if (state is MenuVendorLoaded) {
-        final currentVendor = (state as MenuVendorLoaded).vendor;
-        if (_vendorProfileChanged(currentVendor, vendor)) {
-          log('🍽️ MenuCubit: Vendor profile updated in background, refreshing UI');
-          _safeEmit(MenuVendorLoaded(vendor));
-        } else {
-          log('🍽️ MenuCubit: Vendor profile unchanged, keeping current UI');
-        }
-      }
-    }).catchError((error) {
-      log('❌ MenuCubit: Background vendor refresh failed: $error');
-      // Don't emit error state for background operations
-    });
-  }
-
-  /// Check if vendor profile has changed (simple comparison by key fields)
-  bool _vendorProfileChanged(dynamic oldVendor, dynamic newVendor) {
-    if (oldVendor == null || newVendor == null) return true;
-    
-    return oldVendor.name != newVendor.name ||
-           oldVendor.description != newVendor.description ||
-           oldVendor.openHour != newVendor.openHour ||
-           oldVendor.closeHour != newVendor.closeHour ||
-           oldVendor.imagePath != newVendor.imagePath;
-  }
-
   /// Get vendor profile
   Future<void> getVendorProfile({bool forceRefresh = false, bool showLoadingState = true}) async {
     try {
-      // Check cache first if not forcing refresh
-      if (!forceRefresh && 
-          _cachedVendorProfile != null && 
-          _isCacheValid(_lastVendorUpdate)) {
-        log('🍽️ MenuCubit: Using cached vendor profile');
-        _safeEmit(MenuVendorLoaded(_cachedVendorProfile));
-        return;
-      }
-
-      // If we have cached data but it's expired, show it immediately while refreshing
-      if (!forceRefresh && _cachedVendorProfile != null) {
-        log('🍽️ MenuCubit: Showing stale cached vendor profile while refreshing in background');
-        _safeEmit(MenuVendorLoaded(_cachedVendorProfile));
-        
-        // Refresh in background without showing loading state
-        _refreshVendorProfileInBackground();
-        return;
-      }
-
       if (showLoadingState) {
         _safeEmit(MenuLoadingVendor());
       }
       log('🍽️ MenuCubit: Loading vendor profile from API');
       
       final vendor = await _menuRepository.getVendorProfile();
-      
-      // Cache the result with timestamp
-      _cachedVendorProfile = vendor;
-      _lastVendorUpdate = DateTime.now();
       
       log('🍽️ MenuCubit: Successfully loaded vendor profile: ${vendor.name}');
       _safeEmit(MenuVendorLoaded(vendor));

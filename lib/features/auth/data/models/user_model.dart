@@ -6,6 +6,8 @@ class UserModel {
   final bool isEmailVerified;
   final bool isPhoneVerified;
   final bool isAdmin;
+  final String? updatedAt;
+  final String? createdAt;
 
   UserModel({
     required this.id,
@@ -15,17 +17,35 @@ class UserModel {
     required this.isEmailVerified,
     required this.isPhoneVerified,
     required this.isAdmin,
+    this.updatedAt,
+    this.createdAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
-      name: json['name'],
+      id: json['_id'] ?? json['id'], // API uses _id, fallback to id
+      name: json['name'] ?? '',
       email: json['email'],
-      phone: json['phone'],
-      isEmailVerified: json['isEmailVerified'],
-      isPhoneVerified: json['isPhoneVerified'],
-      isAdmin: json['isAdmin'],
+      phone: json['phone'] ?? 0,
+      isEmailVerified: json['isEmailVerified'] ?? false,
+      isPhoneVerified: json['isPhoneVerified'] ?? false,
+      isAdmin: json['isAdmin'] ?? false,
+      updatedAt: json['updatedAt'],
+      createdAt: json['createdAt'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'isEmailVerified': isEmailVerified,
+      'isPhoneVerified': isPhoneVerified,
+      'isAdmin': isAdmin,
+      'updatedAt': updatedAt,
+      'createdAt': createdAt,
+    };
   }
 }

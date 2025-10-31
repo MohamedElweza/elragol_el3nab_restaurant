@@ -1,7 +1,8 @@
 
 
 class AppConstants {
-static const String baseUrl = 'https://5bf531efcf14.ngrok-free.app';
+  static const String baseUrl = 'https://c8ee04b37e9b.ngrok-free.app';
+  static const String apiKey = 'e542bbe1d99355815db41ec9379805d5';
   static const String appTitle = 'الرجل العناب';
   static const String greetingMorning = 'صباح الخير 👋';
   static const String greetingAfternoon = 'مساء الخير 👋';

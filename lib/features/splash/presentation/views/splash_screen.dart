@@ -1,10 +1,10 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:elragol_el3nab_rest/features/auth/presentation/widgets/sign_in_view_body.dart';
 import 'package:elragol_el3nab_rest/features/orders/presentation/views/orders_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_colors/app_colors.dart';
 import '../../../../core/utils/constants/app_constants.dart';
+import '../../../../core/storage/app_secure_storage.dart';
 import '../../../auth/presentation/views/sign_in_view.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -54,12 +54,26 @@ class _SplashScreenState extends State<SplashScreen>
   }
   Future<void> _delayNavigation() async {
     _controller.forward();
-    Future.delayed(const Duration(seconds: 5), () {
+    
+    // Wait for animations to complete
+    await Future.delayed(const Duration(seconds: 5));
+    
+    // Check if user is already logged in
+    final isLoggedIn = await AppPreferences.isLoggedIn();
+    
+    if (isLoggedIn) {
+      // User is already logged in, go to orders screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => SignInView()),
+        MaterialPageRoute(builder: (_) => const OrdersScreen()),
       );
-    });
+    } else {
+      // User is not logged in, go to sign in screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SignInView()),
+      );
+    }
   }
 
   @override

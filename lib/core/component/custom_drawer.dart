@@ -1,10 +1,10 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:elragol_el3nab_rest/features/profile/presentation/views/profile_view.dart';
-import '../../../../../core/utils/app_colors/app_colors.dart';
-import '../../../../../core/utils/constants/app_constants.dart';
-import '../../features/menu.dart';
-import '../../features/menu/presentation/views/menu.dart';
+import '../utils/app_colors/app_colors.dart';
+import '../utils/constants/app_constants.dart';
+import '../../features/menu/presentation/views/vendor_management_view.dart';
+import '../../features/menu/presentation/views/auth_debug_view.dart';
 
 @immutable
 class DrawerWidget extends StatelessWidget {
@@ -44,6 +44,19 @@ class DrawerWidget extends StatelessWidget {
                 },
               ),
 
+              // _buildDrawerItem(
+              //   context,
+              //   Icons.store_outlined,
+              //   "إعداد المطعم",
+              //       () {
+              //     Navigator.pop(context);
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (_) => const VendorSetupView()),
+              //     );
+              //   },
+              // ),
+
               _buildDrawerItem(
                 context,
                 Icons.restaurant_menu_outlined,
@@ -52,7 +65,7 @@ class DrawerWidget extends StatelessWidget {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const MenuScreen()),
+                    MaterialPageRoute(builder: (_) => const VendorManagementView()),
                   );
                 },
               ),
@@ -78,8 +91,19 @@ class DrawerWidget extends StatelessWidget {
                     () => log("فتح الدعم الفني"),
               ),
 
+              _buildDrawerItem(
+                context,
+                Icons.bug_report_outlined,
+                "فحص المصادقة",
+                    () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AuthDebugView(),
+                  ),
+                ),
+              ),
+
               const Spacer(),
-              _buildLogoutButton(context),
               _buildCopyright(),
             ],
           ),
@@ -152,29 +176,7 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ElevatedButton.icon(
-        onPressed: () => _showLogoutDialog(context),
-        icon: const Icon(Icons.logout, color: Colors.white),
-        label: Text(
-          "تسجيل الخروج",
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.mainColor.withOpacity(.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          minimumSize: const Size.fromHeight(50),
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildCopyright() {
     return Container(
@@ -194,37 +196,4 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'تأكيد تسجيل الخروج',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: const Text('هل أنت متأكد من أنك تريد تسجيل الخروج؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.black)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: () {},
-            child: const Text(
-              'تسجيل الخروج',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

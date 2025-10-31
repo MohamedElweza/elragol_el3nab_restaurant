@@ -15,20 +15,32 @@ import '../components/skeleton_loader.dart';
 
 import 'menu_management_view.dart';
 
-class VendorProfileView extends StatelessWidget {
+class VendorProfileView extends StatefulWidget {
   const VendorProfileView({super.key});
+
+  @override
+  State<VendorProfileView> createState() => _VendorProfileViewState();
+}
+
+class _VendorProfileViewState extends State<VendorProfileView> {
+  @override
+  void initState() {
+    super.initState();
+    // Load vendor profile only once when widget is first created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = GlobalMenuProvider.getInstance();
+      // Only load if we don't already have vendor data
+      if (cubit.state is! MenuVendorLoaded) {
+        cubit.getVendorProfile();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: GlobalMenuProvider.getInstance(),
-      child: Builder(
-        builder: (context) {
-          // Load vendor profile with caching optimization
-          context.read<MenuCubit>().getVendorProfile();
-          return const VendorProfileViewBody();
-        },
-      ),
+      child: const VendorProfileViewBody(),
     );
   }
 }

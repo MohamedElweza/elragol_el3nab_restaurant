@@ -375,93 +375,119 @@ class _VendorProfileSkeletonState extends State<VendorProfileSkeleton>
       animation: _animation,
       builder: (context, child) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(16.0),
+          physics: const NeverScrollableScrollPhysics(), // Prevent scrolling during loading
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo skeleton
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300]!.withOpacity(_animation.value),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Restaurant name skeleton
-              Container(
-                height: 28,
-                width: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300]!.withOpacity(_animation.value),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              const SizedBox(height: 12),
-              
-              // Description skeleton
-              Container(
-                height: 16,
-                width: 300,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300]!.withOpacity(_animation.value),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                height: 16,
-                width: 250,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300]!.withOpacity(_animation.value),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              // Info cards skeleton
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300]!.withOpacity(_animation.value),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300]!.withOpacity(_animation.value),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              
-              // Working hours skeleton
-              Container(
-                height: 80,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300]!.withOpacity(_animation.value),
+              // Vendor Image Card Skeleton (matching exact dimensions)
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                child: Container(
+                  height: 200, // Exact height from actual card
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300]!.withOpacity(_animation.value),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Camera icon placeholder
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400]!.withOpacity(_animation.value),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                      ),
+                      // Name and description skeleton
+                      Positioned(
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 24,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100]!.withOpacity(_animation.value),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              height: 14,
+                              width: MediaQuery.of(context).size.width * 0.6,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100]!.withOpacity(_animation.value),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 32),
               
-              // Management button skeleton
+              const SizedBox(height: 16), // Exact spacing
+              
+              // Vendor Details Card Skeleton
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title "تفاصيل المطعم"
+                      Container(
+                        height: 18,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300]!.withOpacity(_animation.value),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Working Hours Row
+                      _buildSkeletonInfoRow(_animation.value, context),
+                      const SizedBox(height: 12),
+                      
+                      // Working Days Row
+                      _buildSkeletonInfoRow(_animation.value, context),
+                      const SizedBox(height: 12),
+                      
+                      // Status Row
+                      _buildSkeletonInfoRow(_animation.value, context),
+                      const SizedBox(height: 12),
+                      
+                      // Rating Row
+                      _buildSkeletonInfoRow(_animation.value, context),
+                    ],
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 24), // Exact spacing before button
+              
+              // Management Button Skeleton
               Container(
-                height: 56,
-                width: double.infinity,
+                height: 56, // Exact button height
                 decoration: BoxDecoration(
                   color: Colors.grey[300]!.withOpacity(_animation.value),
                   borderRadius: BorderRadius.circular(12),
@@ -471,6 +497,48 @@ class _VendorProfileSkeletonState extends State<VendorProfileSkeleton>
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSkeletonInfoRow(double animationValue, BuildContext context) {
+    return Row(
+      children: [
+        // Icon skeleton
+        Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: Colors.grey[300]!.withOpacity(animationValue),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Content skeleton
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 12,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300]!.withOpacity(animationValue),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                height: 14,
+                width: MediaQuery.of(context).size.width * 0.5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300]!.withOpacity(animationValue),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

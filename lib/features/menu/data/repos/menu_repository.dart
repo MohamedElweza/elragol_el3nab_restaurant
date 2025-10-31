@@ -33,12 +33,53 @@ class MenuRepository {
       log('📱 MenuRepository: Getting vendor ID from stored user data...');
       
       // First check if we have access token
-      final accessToken = await AppPreferences.getAccessToken();
+      var accessToken = await AppPreferences.getAccessToken();
       log('📱 MenuRepository: Access token available: ${accessToken != null && accessToken.isNotEmpty}');
       
+      // If no access token, try to refresh using refresh token
       if (accessToken == null || accessToken.isEmpty) {
-        log('❌ MenuRepository: No access token found - user not logged in');
-        throw AppException('يجب تسجيل الدخول أولاً للوصول إلى هذه الخدمة.');
+        log('🔄 MenuRepository: No access token found, attempting to refresh token...');
+        
+        final refreshToken = await AppPreferences.getRefreshToken();
+        if (refreshToken != null && refreshToken.isNotEmpty) {
+          try {
+            log('🔄 MenuRepository: Refresh token found, calling refresh endpoint...');
+            
+            final refreshDio = Dio(BaseOptions(baseUrl: AppConstants.baseUrl));
+            final response = await refreshDio.post(
+              '/api/v1/vendor/auth/refresh-token',
+              data: {'refreshToken': refreshToken},
+              options: Options(headers: {
+                'X-api-key': AppConstants.apiKey,
+                'ngrok-skip-browser-warning': 'true',
+                'Content-Type': 'application/json',
+              }),
+            );
+
+            if (response.statusCode == 200 && response.data['status'] == 'success') {
+              final data = response.data['data'];
+              final newAccessToken = data['accessToken'];
+              final newRefreshToken = data['refreshToken'];
+
+              // Save new tokens
+              await AppPreferences.saveTokens(newAccessToken, newRefreshToken);
+              log('✅ MenuRepository: Token refreshed successfully');
+              
+              // Update accessToken variable for the rest of the method
+              accessToken = newAccessToken;
+            } else {
+              log('❌ MenuRepository: Token refresh failed - response not successful');
+              throw AppException('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً');
+            }
+          } catch (e) {
+            log('❌ MenuRepository: Token refresh error: $e');
+            await AppPreferences.clearTokens();
+            throw AppException('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً');
+          }
+        } else {
+          log('❌ MenuRepository: No refresh token found - user not logged in');
+          throw AppException('يجب تسجيل الدخول أولاً للوصول إلى هذه الخدمة.');
+        }
       }
       
       final userData = await AppPreferences.getUserData();
